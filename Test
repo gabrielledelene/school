@@ -1,0 +1,89 @@
+/* package whatever; // don't place package name! */
+
+import java.util.*;
+import java.lang.*;
+import java.io.*;
+
+/* Name of the class has to be "Main" only if the class is public. */
+class Test
+{
+	public static boolean isVariable(char c)
+	{
+		return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); 
+	}
+	public static int precedence(char input)
+	{
+		switch (input) { 
+	    case '+': 
+	    case '-': 
+	        return 1; 
+	    case '*': 
+	    case '/': 
+	        return 2; 
+	    case '^':
+	    	return 3;
+	    case '(': 
+	        return 0; 
+	    } 
+	    return -1;
+	}
+	public static String convertToPostfix(String infix)
+	{
+		Stack<Character> operatorStack = new Stack<Character>();
+		String postfix = "";
+		char topOperator = '\0';
+		for(int i = 0 ; i < infix.length() ; i++)
+		{
+			char nextCharacter = infix.charAt(i);
+			if(nextCharacter == ' ')continue;
+			if (isVariable(nextCharacter))
+				postfix = postfix + nextCharacter;
+			else{
+				switch(nextCharacter)
+				{
+					case '^':
+						operatorStack.push(nextCharacter);
+						break;
+					case '+':
+					case '-':
+					case '*':
+					case '/':
+						while(!operatorStack.empty() && 
+						precedence(nextCharacter) <= precedence(operatorStack.peek()))
+						{
+							postfix = postfix + operatorStack.peek();
+							operatorStack.pop();
+						}
+						operatorStack.push(nextCharacter);
+						break;
+					case '(' :
+						operatorStack.push(nextCharacter);
+						break;
+					case ')' :
+						topOperator = operatorStack.pop();
+						while (topOperator != '(')
+						{
+							postfix = postfix + topOperator;
+							topOperator = operatorStack.pop();
+						}
+						break;
+					default:
+						break;
+				}
+			}
+		}
+		while(!operatorStack.empty())
+		{
+			topOperator = operatorStack.pop();
+			postfix = postfix + topOperator;
+		}
+		return postfix;
+	}
+	public static void main (String[] args) throws java.lang.Exception
+	{
+		System.out.println(convertToPostfix("a * b / (c -d)"));
+		System.out.println(convertToPostfix("(a -b * c) / (d * e * f + g)"));
+		System.out.println(convertToPostfix("a / b * (c + (d -e))"));
+		System.out.println(convertToPostfix("(a ^ b * c -d) ^ e + f ^ g ^ h"));
+	}
+}
